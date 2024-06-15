@@ -125,7 +125,7 @@ def perform_long_running_task(task_id, data):
     current_app.logger.info(f"perform_long_running_task:{task_id}")
 
     base_dir = os.path.dirname(__file__)  # 获取当前文件的目录
-    model_path = os.path.join(base_dir, '..', '..', 'training', 'model', 'baggingRandomForest.pickle')
+    model_path = os.path.join(base_dir, '..', '..', 'training', 'model', 'bothawk_model.pickle')
 
     # 加载预训练的模型
     with open(model_path, 'rb') as model_file:

@@ -16,14 +16,14 @@ import xgboost as xgb
 
 def load_data():
     # read CSV file
-    df = pd.read_csv("data/bothawk_data.csv")
+    df = pd.read_csv("data/transformed_final_merged_features.csv")
     # df['Number of Connection Account'].astype('int64')
-    df.dropna()
+    df.dropna(inplace=True)
     #
-    # # 定义归一化函数
+    # # Define the normalized function
     # normalize = lambda x: (x - x.min()) / (x.max() - x.min())
     #
-    # # 对数据框中的各列进行归一化处理
+    # # Normalize the columns in the data frame
     # df[["Number of followers", "Number of following", "Number of Activity",
     #     "Number of Issue", "Number of Pull Request", "Number of Repository", "Number of Commit",
     #     "Number of Active day", "Periodicity of Activities", "Number of Connection Account",
@@ -32,27 +32,27 @@ def load_data():
     #                                    "Number of Active day", "Periodicity of Activities",
     #                                    "Number of Connection Account", "Median Response Time"]].apply(normalize)
 
-    # 选取需要的特征与标签作为模型输入
+    # Select the required features and labels as model inputs
     df = df[["login", "name", "email", "bio", "Number of followers", "Number of following", "tfidf_similarity", "Number of Activity",
              "Number of Issue", "Number of Pull Request", "Number of Repository", "Number of Commit",
              "Number of Active day", "Periodicity of Activities", "Number of Connection Account",
              "Median Response Time", 'label']]
 
-    # 将标签“Bot”和“Human”映射为数值0和1
+    # Map the labels "Bot" and "Human" to the values 0 and 1.
     bot_mapping = {'Human': 0, 'Bot': 1}
     df['label'] = df['label'].replace(bot_mapping)
 
-    # 筛选出正样本和负样本
+    # Filter out positive and negative samples
     pos_samples = df[df['label'] == 1]
     neg_samples = df[df['label'] == 0]
 
-    # 随机下采样
+    # Random undersampling
     neg_samples = neg_samples.sample(n=pos_samples.shape[0], replace=False, random_state=42)
 
-    # 合并正样本和负样本
+    # Merge positive samples and negative samples
     df = pd.concat([pos_samples, neg_samples])
 
-    # 定义特征和标签
+    # Define features and labels
     X = df.drop('label', axis=1)
     y = df['label']
 
@@ -63,12 +63,11 @@ def load_data():
 
 
 def preprocess_data(X):
-    # 数据预处理（无需进行任何操作）
     return X
 
 
 def get_evaluation_metrics(y_true, y_pred):
-    # 计算评估指标（准确率、精确率、召回率、F1分数和混淆矩阵）
+    # Calculate evaluation metrics (accuracy, precision, recall, F1 score and confusion matrix)
     accuracy = accuracy_score(y_true, y_pred)
     precision = precision_score(y_true, y_pred)
     recall = recall_score(y_true, y_pred)
@@ -90,20 +89,25 @@ def train_and_evaluate_model(X_train, X_test, y_train, y_test):
     ]
 
     params = [
-        {'base_estimator__max_depth': [3, 5, 7],
-         'base_estimator__min_samples_split': [2, 4, 8]},
-        {'base_estimator__n_neighbors': [3, 5, 7],
-         'base_estimator__weights': ['uniform', 'distance']},
-        {'base_estimator__n_estimators': [10, 50, 100],
-         'base_estimator__max_depth': [3, 5, 7]},
-        {
-            'n_estimators': [100, 200, 300],
-            'max_depth': [3, 5, 7],
-            'learning_rate': [0.1, 0.01, 0.001]
-        },
-        {'base_estimator__C': [0.1, 1.0, 10.0]},
-        {},
-        {}
+        {'estimator__max_depth': [3, 5, 7, 9, 11],
+         'estimator__min_samples_split': [2, 4, 8, 16],
+         'estimator__min_samples_leaf': [1, 2, 4]},
+        {'estimator__n_neighbors': [3, 5, 7, 9],
+         'estimator__weights': ['uniform', 'distance'],
+         'estimator__metric': ['euclidean', 'manhattan']},
+        {'estimator__n_estimators': [10, 50, 100, 200],
+         'estimator__max_depth': [3, 5, 7, 9],
+         'estimator__min_samples_split': [2, 4, 8]},
+        {'n_estimators': [100, 200, 300],
+         'max_depth': [3, 5, 7, 9],
+         'learning_rate': [0.1, 0.01, 0.001]},
+        {'estimator__C': [0.01, 0.1, 1.0, 10.0, 100.0],
+         'estimator__solver': ['newton-cg', 'lbfgs', 'liblinear'],
+         'estimator__max_iter': [100, 200, 300]},
+        {'estimator__C': [0.1, 1.0, 10.0],
+         'estimator__kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
+         'estimator__gamma': ['scale', 'auto']},
+        {'estimator__var_smoothing': [1e-9, 1e-8, 1e-7, 1e-6]}
     ]
 
     eval_df = pd.DataFrame(columns=['Accuracy', 'Precision', 'Recall', 'F1-score', 'AUC'])
@@ -204,11 +208,9 @@ def main():
     # 加载数据
     X_train, X_test, y_train, y_test = load_data()
 
-    # 数据预处理
     X_train = preprocess_data(X_train)
     X_test = preprocess_data(X_test)
 
-    # 训练和评估模型
     train_and_evaluate_model(X_train, X_test, y_train, y_test)
 
 

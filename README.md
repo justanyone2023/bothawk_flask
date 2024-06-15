@@ -1,28 +1,103 @@
-# bot_hawk
+# Bot Hawk: OSS Robot Account Identification
+## Description
+Bot Hawk is a project designed to identify robot accounts in open-source software (OSS) repositories. The project is implemented using Python and Flask, making it easy to set up and run on any system.
+Directory Structure
 
-**start**
+![img.png](img/img.png)
 
-```
-git clone https://github.com/abbeyokgo/flask_template.git #下载源码
-cd flask_template #切换到目录下
-pip install -r requirements.txt
-#init
-export FLASK_APP=manage.py #linux
-set FLASK_APP=manage.py #windows cmd
-$env:FLASK_APP = "manage"  #windows powershell
-flask db init #Initialize database
-flask db migrate #Migration
-flask db upgrade #upgrade
-flask run #run
-```
+The project directory is organized as follows:
 
-After running the website, prompt
+- app: Contains the main application code, including routes, models, and views.
+- training: Holds scripts and data for training the models used to identify robot accounts.
+
+## How to Use
+
+### Clone the Repository and Install Requirements
+```shell
+git clone https://github.com/justanyone2023/bothawk_flask.git  # Download the source code
+cd bothawk_flask  # Navigate to the project directory
+pip install -r requirements.txt  # Install required packages
 ```
-[root@centos flask_template]# python manage.py runserver
+### Initialize and Run the Project
+
+Depending on your operating system, use one of the following commands to set the FLASK_APP environment variable:
+- Linux:
+```shell
+export FLASK_APP=manage.py
+```
+- Windows (CMD):
+```shell
+set FLASK_APP=manage.py
+```
+- Windows (PowerShell):
+```shell
+$env:FLASK_APP = "manage"
+```
+Then, run the following commands to initialize the database, perform migrations, and start the server:
+```shell
+flask db init  # Initialize the database
+flask db migrate  # Apply migrations
+flask db upgrade  # Upgrade the database schema
+flask run  # Start the server
+```
+After running the above command, you should see the following output:
+```shell
+[root@centos bothawk_flask]# python manage.py runserver
  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
  * Restarting with stat
  * Debugger is active!
  * Debugger PIN: 128-717-467
 ```
+Access the Application
 
-然后浏览器打开：`127.0.0.1:5000`即可
+Open your web browser and navigate to http://127.0.0.1:5000 to access the application.
+
+## RESTful Interfaces
+### User Endpoint
+
+URL
+```agsl
+/user
+```
+Method
+- GET: Submit user data as query parameters.
+- POST: Submit user data as a JSON payload.
+
+Example Request
+```agsl
+GET /user?account=justanyone&accountType=username
+```
+Response
+
+Returns a JSON object with the task submission status and a task ID.
+```json
+{
+  "success": True,
+  "message": "Task submitted",
+  "task_id": "your-task-id"
+}
+```
+### Task Endpoint
+URL
+```agsl
+/task/<task_id>
+```
+
+Method
+- GET: Retrieve the status of a task.
+
+Example Request
+```agsl
+GET /task/{task_id}
+```
+Response
+```json
+{
+  "status": "in progress",
+  "progress": 50,
+  "data": "user data",
+  "prediction_list": ["prediction1", "prediction2"]
+}
+```
+
+
