@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Account Bot Checker</title> <!-- 更新了页面标题 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h1 class="mt-5">GitHub Account Bot Checker</h1> <!-- 更新了大标题 -->
+    <p class="text-muted">This tool helps you determine if a GitHub account is operated by a bot. Please provide the GitHub username or user ID.</p> <!-- 添加了简介 -->
+    <p class="text-warning">A check takes approximately 30 seconds.</p> <!-- 更新了提示信息的样式 -->
+    <form id="checkForm" class="mt-3">
+        <div class="mb-3">
+            <label for="accountInput" class="form-label">GitHub Username or User ID</label> <!-- 更新了表单标签 -->
+            <input type="text" class="form-control" id="accountInput" name="account" placeholder="Enter username or user ID" required>
+        </div>
+        <div class="mb-3">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="accountType" id="usernameRadio" value="username" checked>
+                <label class="form-check-label" for="usernameRadio">Username</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="accountType" id="idRadio" value="id">
+                <label class="form-check-label" for="idRadio">User ID</label>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Check</button>
+    </form>
+    <!-- Spinner 和进度条 -->
+    <div id="loadingSection" class="mt-3" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="progress mt-2">
+            <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">Processing...</div>
+        </div>
+    </div>
+    <div id="result" class="mt-3"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    let baseurl = 'http://bothawk.x-lab.info'
+    $('#checkForm').on('submit', function(e) {
+        e.preventDefault();
+        $('#loadingSection').show(); // 显示加载提示和进度条
+        $('button[type="submit"]').text('Checking...').prop('disabled', true); // 改变按钮文字并禁用按钮，防止重复提交
+
+        $.ajax({
+            url: baseurl + '/user',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                account: $('#accountInput').val(),
+                accountType: $('input[name="accountType"]:checked').val()
+            }),
+            success: function(data) {
+                // 开始轮询
+                pollForResults(data.task_id);
+            },
+            error: function() {
+                $('#loadingSection').hide();
+                $('#result').html(`<p>An error occurred. Please try again.</p>`);
+            }
+        });
+    });
+
+    function pollForResults(taskId) {
+        $.ajax({
+            url: baseurl + '/task/' + taskId,
+            type: 'GET',
+            success: function(data) {
+                if (data.status === 'in progress') {
+                    // 更新进度条
+                    updateProgressBar(data.progress);
+                    // 如果任务仍在进行中，等待一段时间后再次轮询
+                    setTimeout(function() { pollForResults(taskId); }, 3000);
+                } else {
+                    // 任务完成，隐藏进度条并显示结果
+                    $('#loadingSection').hide();
+                    // 任务完成，显示结果
+                    $('#loadingSection').hide();
+                    displayResults(data);
+                }
+            },
+            error: function() {
+                $('#loadingSection').hide();
+                $('#result').html(`<p>An error occurred while fetching the results.</p>`);
+                resetButtonState();
+            }
+        });
+    }
+
+    function displayResults(data) {
+        let predictionText = data.result === 1 ? "Bot" : "Human";
+        let userInfoHtml = `
+            <h2>Result:</h2>
+            <p>Prediction: <strong>${predictionText}</strong></p> <!-- 突出显示预测结果 -->
+            <h2>User Information:</h2>
+            <p>Login: ${data.data.login}</p>
+            <p>Name: ${data.data.name}</p>
+            <p>Email: ${data.data.email}</p>
+            <p>Bio: ${data.data.bio}</p>
+            <p>Number of Followers: ${data.data['Number of followers']}</p>
+            <p>Number of Following: ${data.data['Number of following']}</p>
+            <p>TF-IDF Similarity: ${data.data.tfidf_similarity}</p>
+            <p>Number of Activity: ${data.data['Number of Activity']}</p>
+            <p>Number of Issue: ${data.data['Number of Issue']}</p>
+            <p>Number of Pull Request: ${data.data['Number of Pull Request']}</p>
+            <p>Number of Repository: ${data.data['Number of Repository']}</p>
+            <p>Number of Commit: ${data.data['Number of Commit']}</p>
+            <p>Number of Active Day: ${data.data['Number of Active day']}</p>
+            <p>Periodicity of Activities: ${data.data['Periodicity of Activities']}</p>
+            <p>Number of Connection Account: ${data.data['Number of Connection Account']}</p>
+            <p>Median Response Time: ${data.data['Median Response Time']}</p>
+            `;
+        $('#result').html(userInfoHtml);
+        resetButtonState(); // 重置按钮状态
+    }
+    // 在错误处理函数中调用此函数
+    function resetButtonState() {
+        $('button[type="submit"]').text('Check').prop('disabled', false); // 恢复按钮的初始文字和状态
+    }
+
+    // 更新您的错误处理逻辑，确保在发生错误时也能重置按钮状态
+    function handleError() {
+        $('#loadingSection').hide();
+        $('#result').html(`<p>An error occurred while fetching the results.</p>`);
+        resetButtonState(); // 重置按钮状态
+    }
+
+    function updateProgressBar(progress) {
+        // 显示进度条（如果之前隐藏）
+        $('#loadingSection').show();
+        // 更新进度条的宽度和文本
+        $('.progress-bar').css('width', progress + '%').attr('aria-valuenow', progress).text(progress + "% Processing...");
+    }
+</script>
+</body>
+</html>
