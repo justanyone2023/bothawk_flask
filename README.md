@@ -20,6 +20,14 @@ pip install -r requirements.txt  # Install required packages
 ```
 ### Initialize and Run the Project
 
+Before running the project, ensure that you have configured the necessary parameters in the `config.py` file. You need to replace the following variables with your actual information:
+    - `GITHUB_API_TOKEN`: Your GitHub API token.
+    - `CLICKHOUSE_HOST`: ClickHouse database host address.
+    - `CLICKHOUSE_USER`: ClickHouse database username.
+    - `CLICKHOUSE_PASSWORD`: ClickHouse database password.
+    - `CLICKHOUSE_DATABASE`: ClickHouse database name.
+    - `SQLALCHEMY_DATABASE_URI`: SQLAlchemy database URI.
+
 Depending on your operating system, use one of the following commands to set the FLASK_APP environment variable:
 - Linux:
 ```shell

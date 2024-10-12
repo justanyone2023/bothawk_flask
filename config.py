@@ -2,7 +2,6 @@
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
     MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.googlemail.com')
@@ -19,8 +18,14 @@ class Config:
     GITHUB_API_TOKEN = ""
     CLICKHOUSE_HOST = ''
     CLICKHOUSE_USER = ''
-    CLICKHOUSE_PASSWORD = '!'
+    CLICKHOUSE_PASSWORD = ''
     CLICKHOUSE_DATABASE = ''
+
+
+    # Redis configuration
+    REDIS_HOST = "localhost"
+    REDIS_PORT = 6379
+    REDIS_DB = 0
 
     @staticmethod
     def init_app(app):

@@ -19,8 +19,12 @@ from ..utils.githubUtil import get_user_info_by_name, get_user_info_by_id
 from concurrent.futures import ThreadPoolExecutor
 import redis
 
-# 连接到Redis服务器
-redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
+# Connect to the Redis server
+redis_client = redis.StrictRedis(
+    host=current_app.config['REDIS_HOST'],
+    port=current_app.config['REDIS_PORT'],
+    db=current_app.config['REDIS_DB']
+)
 
 executor = ThreadPoolExecutor(8)  # 设置线程池
 
