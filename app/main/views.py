@@ -21,9 +21,9 @@ import redis
 
 # Connect to the Redis server
 redis_client = redis.StrictRedis(
-    host=current_app.config['REDIS_HOST'],
-    port=current_app.config['REDIS_PORT'],
-    db=current_app.config['REDIS_DB']
+    host="localhost",
+    port=6379,
+    db=0
 )
 
 executor = ThreadPoolExecutor(8)  # 设置线程池
