@@ -1,0 +1,15 @@
+﻿model,status,avg_predict_time_seconds,min_predict_time_seconds,max_predict_time_seconds,avg_predict_time_formatted,num_samples,error,num_sub_models,avg_time_per_model,sub_models,sub_model_1_name,sub_model_1_avg_time,sub_model_1_min_time,sub_model_1_max_time,sub_model_1_status,sub_model_2_name,sub_model_2_avg_time,sub_model_2_min_time,sub_model_2_max_time,sub_model_2_status,sub_model_3_name,sub_model_3_avg_time,sub_model_3_min_time,sub_model_3_max_time,sub_model_3_status,sub_model_4_name,sub_model_4_avg_time,sub_model_4_min_time,sub_model_4_max_time,sub_model_4_status,sub_model_5_name,sub_model_5_avg_time,sub_model_5_min_time,sub_model_5_max_time,sub_model_5_status,sub_model_6_name,sub_model_6_avg_time,sub_model_6_min_time,sub_model_6_max_time,sub_model_6_status,sub_model_7_name,sub_model_7_avg_time,sub_model_7_min_time,sub_model_7_max_time,sub_model_7_status,num_classifiers,num_models_per_classifier,total_models,classifier_1_name,classifier_1_avg_time,classifier_1_status,classifier_1_num_models,classifier_2_name,classifier_2_avg_time,classifier_2_status,classifier_2_num_models,classifier_3_name,classifier_3_avg_time,classifier_3_status,classifier_3_num_models
+BoDeGHa,success,0.01779654570000009,0.017188333,0.018260500000000235,0.0178秒,5934,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Bothunter,success,0.002183074899999893,0.002067582999999651,0.0024233749999997833,2.18毫秒,5765,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Bothawk,failed,0.0,0.0,0.0,0.00微秒,188,"预测失败: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- Median Response Time
+- Number of Active day
+- Number of Activity
+- Number of Commit
+- Number of Connection Account
+- ...
+",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Bothawk V1,success,0.10234186670000006,0.0,0.0,0.1023秒,N/A,,7.0,0.014620266671428581,"DecisionTree, KNeighbors, RandomForest, XGBoost, LogisticRegression, SVC, GaussianNB",DecisionTree,0.0013378168999999662,0.0012449589999996569,0.0014704160000000854,success,KNeighbors,0.027210054100000037,0.010479541000000037,0.057832374999999825,success,RandomForest,0.018637154200000117,0.018131499999999967,0.019910291000000413,success,XGBoost,0.0014239707000000656,0.0012868329999999872,0.001712165999999904,success,LogisticRegression,0.0013662666999999296,0.0012972499999999165,0.0014614169999997983,success,SVC,0.050081954199999945,0.04629941699999973,0.0709123749999998,success,GaussianNB,0.002284649899999991,0.0018621670000000812,0.0033483329999999256,success,,,,,,,,,,,,,,,
+Bothawk V2,success,0.37588717419999956,0.0,0.0,0.3759秒,N/A,,,0.017899389247619028,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,3.0,7.0,21.0,StatisticalAnalysis,0.15657383709999984,success,7.0,BinaryDecision,0.1631851665999999,success,7.0,Ensemble,0.05612817049999981,success,7.0
+Rabbit,failed,0.0,0.0,0.0,0.00微秒,N/A,"模型加载失败: sklearn版本不兼容(_loss模块缺失). 解决方案: 1)重新训练模型使用当前sklearn版本, 2)降级sklearn到模型训练时的版本, 3)使用兼容的sklearn版本(建议0.24.x或1.0.x)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

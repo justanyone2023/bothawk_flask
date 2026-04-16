@@ -1,10 +1,17 @@
 import os
+import sys
 from rabbit.rabbit import get_results
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+sys.path.insert(0, PROJECT_ROOT)
+from config import Config
 
 split_dir = 'data/rabbit/splits'
 split_files = sorted([f for f in os.listdir(split_dir) if f.startswith('filtered_clean_data_actors_part_')])
 
-apikey = os.getenv('GITHUB_API_KEY')
+apikey = Config.GITHUB_API_TOKEN
+if not apikey:
+    raise ValueError("Missing Config.GITHUB_API_TOKEN in config.py.")
 min_events = 10
 min_confidence = 0.75
 max_queries = 100

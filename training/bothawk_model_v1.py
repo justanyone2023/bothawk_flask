@@ -1,5 +1,6 @@
 import pandas as pd
 import pickle
+import os
 
 from sklearn.inspection import permutation_importance
 from sklearn.linear_model import LogisticRegression
@@ -16,7 +17,9 @@ import xgboost as xgb
 
 def load_data():
     # read CSV file
-    df = pd.read_csv("data/transformed_final_merged_features.csv")
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    filepath = os.path.join(script_dir, 'data', 'transformed_final_merged_features.csv')
+    df = pd.read_csv(filepath)
     # df['Number of Connection Account'].astype('int64')
     df.dropna(inplace=True)
     #
@@ -121,7 +124,10 @@ def train_and_evaluate_model(X_train, X_test, y_train, y_test):
             grid_search = GridSearchCV(xgb_model, params[i], cv=5, scoring='accuracy')
             grid_search.fit(X_train, y_train)
 
-            with open('model/baggingXGBoost.pickle', 'wb') as f:
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            model_dir = os.path.join(script_dir, 'model')
+            os.makedirs(model_dir, exist_ok=True)
+            with open(os.path.join(model_dir, 'baggingXGBoost.pickle'), 'wb') as f:
                 pickle.dump(grid_search.best_estimator_, f)
 
             y_pred = grid_search.predict(X_test)
@@ -140,7 +146,10 @@ def train_and_evaluate_model(X_train, X_test, y_train, y_test):
             grid_search.fit(X_train, y_train)
 
             # Save the best estimator
-            with open(f'model/bagging{name}.pickle', 'wb') as f:
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            model_dir = os.path.join(script_dir, 'model')
+            os.makedirs(model_dir, exist_ok=True)
+            with open(os.path.join(model_dir, f'bagging{name}.pickle'), 'wb') as f:
                 pickle.dump(grid_search.best_estimator_, f)
 
             # Predict labels
@@ -175,11 +184,14 @@ def train_and_evaluate_model(X_train, X_test, y_train, y_test):
         eval_df.loc['bagging' + name] = [accuracy, precision, recall, f1, pr_auc]
 
         if i == len(base_clf) - 1:
-            eval_df.to_csv(f'./result/eva/bagging{name}_metrics.csv')
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            result_dir = os.path.join(script_dir, 'result', 'eva')
+            os.makedirs(result_dir, exist_ok=True)
+            eval_df.to_csv(os.path.join(result_dir, f'bagging{name}_metrics.csv'))
             # 将DataFrame写入CSV文件中
-            df_roc.to_csv(f'./result/eva/bagging{name}_roc_curve_data.csv', index=False)
-            df_pr.to_csv(f'./result/eva/bagging{name}_pr_curve_data.csv', index=False)
-            df_perm_imp.to_csv(f'./result/eva/bagging{name}_perm_imp.csv', index=False)
+            df_roc.to_csv(os.path.join(result_dir, f'bagging{name}_roc_curve_data.csv'), index=False)
+            df_pr.to_csv(os.path.join(result_dir, f'bagging{name}_pr_curve_data.csv'), index=False)
+            df_perm_imp.to_csv(os.path.join(result_dir, f'bagging{name}_perm_imp.csv'), index=False)
 
 
         print(f"Best parameters for {name}: {grid_search.best_params_}")

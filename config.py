@@ -16,10 +16,10 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     GITHUB_API_TOKEN = ""
-    CLICKHOUSE_HOST = ''
-    CLICKHOUSE_USER = ''
-    CLICKHOUSE_PASSWORD = ''
-    CLICKHOUSE_DATABASE = ''
+    CLICKHOUSE_HOST = 'cc-2ze7189376o5m9759.public.clickhouse.ads.aliyuncs.com'
+    CLICKHOUSE_USER = 'xlab'
+    CLICKHOUSE_PASSWORD = 'Xlab2021!'
+    CLICKHOUSE_DATABASE = 'opensource'
 
 
     # Redis configuration
@@ -36,7 +36,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
     # SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
     #     'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
-    SQLALCHEMY_DATABASE_URI = ""
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:Xlabecnu123@rm-uf6g5axfi47d98803zo.mysql.rds.aliyuncs.com:3306/bothawk"
 
 
 class TestingConfig(Config):

@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import time
 import warnings
+import os
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB
@@ -144,7 +145,10 @@ def evaluate_model(model, X_train, X_test, y_train, y_test):
     })
 
     # 将DataFrame保存为CSV文件
-    roc_df.to_csv(f'./result/{model_name}_roc_curve_data.csv', index=False)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    result_dir = os.path.join(script_dir, 'result')
+    os.makedirs(result_dir, exist_ok=True)
+    roc_df.to_csv(os.path.join(result_dir, f'{model_name}_roc_curve_data.csv'), index=False)
 
     # 计算并保存PR曲线数据
     precision_curve, recall_curve, _ = precision_recall_curve(y_test, y_pred_proba)
@@ -155,7 +159,7 @@ def evaluate_model(model, X_train, X_test, y_train, y_test):
 
 
 
-    pr_df.to_csv(f'./result/{model_name}_pr_curve_data.csv', index=False)
+    pr_df.to_csv(os.path.join(result_dir, f'{model_name}_pr_curve_data.csv'), index=False)
 
 
     # 存储每个模型的评估结果到列表中
@@ -172,7 +176,8 @@ def train_and_evaluate_model(model_list, X_train, X_test, y_train, y_test):
 
 
 def main():
-    filepath = "./data/bothawk_data.csv"
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    filepath = os.path.join(script_dir, 'data', 'bothawk_data.csv')
     X, y, features = load_data(filepath)
     model_list = preprocess_data(X, y, features)
     # 划分训练集和测试集
@@ -180,7 +185,9 @@ def main():
     # 对每个模型进行训练与评估
     df_output = train_and_evaluate_model(model_list, X_train, X_test, y_train, y_test)
     # 将DataFrame写入CSV文件
-    df_output.to_csv('./result/model_evaluation_v1.csv', index=False)
+    result_dir = os.path.join(script_dir, 'result')
+    os.makedirs(result_dir, exist_ok=True)
+    df_output.to_csv(os.path.join(result_dir, 'model_evaluation_v1.csv'), index=False)
 
 
 if __name__ == '__main__':

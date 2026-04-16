@@ -1,5 +1,6 @@
 import pandas as pd
 import pickle
+import os
 
 from sklearn.inspection import permutation_importance
 from sklearn.linear_model import LogisticRegression
@@ -16,7 +17,9 @@ import xgboost as xgb
 
 def load_data():
     # read CSV file
-    df = pd.read_csv("data/bothawk_data.csv")
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    filepath = os.path.join(script_dir, 'data', 'bothawk_data.csv')
+    df = pd.read_csv(filepath)
     # df['Number of Connection Account'].astype('int64')
     df.dropna()
 
@@ -123,7 +126,10 @@ def train_and_evaluate_model(X_train, X_test, y_train, y_test, classifier_name):
             grid_search = GridSearchCV(xgb_model, params[i], cv=5, scoring='accuracy')
             grid_search.fit(X_train, y_train)
 
-            with open(f'model/{classifier_name}-baggingXGBoost.pickle', 'wb') as f:
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            model_dir = os.path.join(script_dir, 'model')
+            os.makedirs(model_dir, exist_ok=True)
+            with open(os.path.join(model_dir, f'{classifier_name}-baggingXGBoost.pickle'), 'wb') as f:
                 pickle.dump(grid_search.best_estimator_, f)
 
             y_pred = grid_search.predict(X_test)
@@ -142,7 +148,10 @@ def train_and_evaluate_model(X_train, X_test, y_train, y_test, classifier_name):
             grid_search.fit(X_train, y_train)
 
             # Save the best estimator
-            with open(f'model/{classifier_name}-bagging{name}.pickle', 'wb') as f:
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            model_dir = os.path.join(script_dir, 'model')
+            os.makedirs(model_dir, exist_ok=True)
+            with open(os.path.join(model_dir, f'{classifier_name}-bagging{name}.pickle'), 'wb') as f:
                 pickle.dump(grid_search.best_estimator_, f)
 
             # Predict labels
@@ -177,11 +186,14 @@ def train_and_evaluate_model(X_train, X_test, y_train, y_test, classifier_name):
         eval_df.loc['bagging' + name] = [accuracy, precision, recall, f1, pr_auc]
 
         if i == len(base_clf) - 1:
-            eval_df.to_csv(f'./result/eva/{classifier_name}-bagging{name}_metrics.csv')
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            result_dir = os.path.join(script_dir, 'result', 'eva')
+            os.makedirs(result_dir, exist_ok=True)
+            eval_df.to_csv(os.path.join(result_dir, f'{classifier_name}-bagging{name}_metrics.csv'))
             # 将DataFrame写入CSV文件中
-            df_roc.to_csv(f'./result/eva/{classifier_name}-bagging{name}_roc_curve_data.csv', index=False)
-            df_pr.to_csv(f'./result/eva/{classifier_name}-bagging{name}_pr_curve_data.csv', index=False)
-            df_perm_imp.to_csv(f'./result/eva/{classifier_name}-bagging{name}_perm_imp.csv', index=False)
+            df_roc.to_csv(os.path.join(result_dir, f'{classifier_name}-bagging{name}_roc_curve_data.csv'), index=False)
+            df_pr.to_csv(os.path.join(result_dir, f'{classifier_name}-bagging{name}_pr_curve_data.csv'), index=False)
+            df_perm_imp.to_csv(os.path.join(result_dir, f'{classifier_name}-bagging{name}_perm_imp.csv'), index=False)
 
         # 输出最佳模型所用的参数组合
         print(f"Best parameters for {classifier_name}-{name}: {grid_search.best_params_}")
@@ -232,8 +244,9 @@ def main():
     X_binaryDecisionClassifier_test = X_test[["login", "name", "email", "bio"]]
     train_and_evaluate_model(X_binaryDecisionClassifier_train, X_binaryDecisionClassifier_test, y_train, y_test, "BinaryDecision")
 
-    statisticalAnalysisClassifier = load_model("./model/StatisticalAnalysis-baggingRandomForest.pickle")
-    binaryDecisionClassifier = load_model("./model/BinaryDecision-baggingRandomForest.pickle")
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    statisticalAnalysisClassifier = load_model(os.path.join(script_dir, "model", "StatisticalAnalysis-baggingRandomForest.pickle"))
+    binaryDecisionClassifier = load_model(os.path.join(script_dir, "model", "BinaryDecision-baggingRandomForest.pickle"))
 
     _, probabilities_statistical = predict_and_output_probabilities(X_statisticalAnalysisClassifier_train, statisticalAnalysisClassifier)
     _, probabilities_binary = predict_and_output_probabilities(X_binaryDecisionClassifier_train, binaryDecisionClassifier)
